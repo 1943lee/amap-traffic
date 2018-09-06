@@ -16,4 +16,13 @@ public interface Consts {
     String esChinaId = "1";
 
     String chinaEndPoint = "/" + esIndex + "/" + esType + "/" + esChinaId;
+
+    /**
+     * 高德api host url
+     */
+    String gdHost = "http://restapi.amap.com/";
+
+    String gdBatchUrl = gdHost + "v3/batch";
+
+    String gdTrafficEndpoint = "/v3/traffic/status/rectangle";
 }

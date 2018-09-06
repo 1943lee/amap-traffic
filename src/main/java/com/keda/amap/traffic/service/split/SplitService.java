@@ -59,6 +59,7 @@ public class SplitService {
 
         int limit = 5000;
         long operateCount = 0;
+        long outOfRegionCount = 0;
         List<Parts> partsList = new ArrayList<>();
         for(int i = 0; i < xTimes; i++) {
             double xmin_mercator = leftBottomMercatorPoint[0] + i * width;
@@ -91,6 +92,11 @@ public class SplitService {
                 parts.setYmaxGcj(xmaxYmaxGcj02[1]);
 
                 parts.setInRegion(regionService.inRegion(xminYmin[0], xminYmin[1], xmaxYmax[0], xmaxYmax[1]));
+                // 不在指定范围内的矩形，不入库
+                if(!parts.getInRegion()) {
+                    outOfRegionCount++;
+                    continue;
+                }
 
                 partsList.add(parts);
 
@@ -98,7 +104,7 @@ public class SplitService {
                 if(limit == 0) {
                     operateCount += 5000;
                     Anima.atomic(() -> partsList.forEach(Model::save));
-                    log.info("本次插入{},已插入{},总量{}", 5000, operateCount, xTimes * yTimes);
+                    log.info("本次插入{},已插入{},区域外数据{},总量{}", 5000, operateCount, outOfRegionCount, xTimes * yTimes);
                     partsList.clear();
                     limit = 5000;
                 }
@@ -108,7 +114,7 @@ public class SplitService {
         if(partsList.size() > 0) {
             operateCount += partsList.size();
             Anima.atomic(() -> partsList.forEach(Model::save));
-            log.info("本次插入{},已插入{},总量{}", partsList.size(), operateCount, xTimes * yTimes);
+            log.info("本次插入{},已插入{},区域外数据{},总量{}", partsList.size(), operateCount, outOfRegionCount, xTimes * yTimes);
         }
 
     }

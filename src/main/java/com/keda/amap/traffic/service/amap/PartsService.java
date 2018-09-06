@@ -1,10 +1,11 @@
 package com.keda.amap.traffic.service.amap;
 
 import com.keda.amap.traffic.model.entity.Parts;
-import io.github.biezhi.anima.Anima;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
+
+import static io.github.biezhi.anima.Anima.select;
 
 /**
  * Created by liChenYu on 2018/9/5
@@ -19,12 +20,24 @@ public class PartsService {
         Integer colStart = col[0];
         Integer colEnd = col.length > 1 ? col[1] : colStart;
 
-        return Anima.select().from(Parts.class)
+        if(rowStart == -1 & colStart == -1) {
+            return select().from(Parts.class)
+                    .where(Parts::getInRegion).eq(true)
+                    .all();
+        }
+
+        return select().from(Parts.class)
                 .where(Parts::getRow).gte(rowStart)
                 .and(Parts::getRow).lte(rowEnd)
                 .and(Parts::getCol).gte(colStart)
                 .and(Parts::getCol).lte(colEnd)
                 .and(Parts::getInRegion).eq(true)
+                .all();
+    }
+
+    public List<Parts> getInRegionParts() {
+        return select().from(Parts.class)
+                .where(Parts::getInRegion).eq(true)
                 .all();
     }
 }

@@ -12,4 +12,18 @@ import org.springframework.context.annotation.Configuration;
 @ConfigurationProperties(prefix = "amap")
 public class AmapConfig {
     private String webKey;
+
+    private String[] apiKey;
+
+    private int index = 0;
+
+    public String getBaiBuAk() {
+        if(null != apiKey && apiKey.length > 0) {
+            String ak = apiKey[index];
+            index++;
+            index = index % apiKey.length;
+            return ak;
+        }
+        return "";
+    }
 }

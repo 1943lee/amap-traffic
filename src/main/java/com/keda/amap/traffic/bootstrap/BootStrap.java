@@ -3,6 +3,7 @@ package com.keda.amap.traffic.bootstrap;
 import com.keda.amap.traffic.service.split.RegionService;
 import com.keda.amap.traffic.service.split.SplitService;
 import io.github.biezhi.anima.Anima;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -12,6 +13,7 @@ import org.springframework.stereotype.Component;
  * 启动类
  * Created by liChenYu on 2018/9/4
  */
+@Slf4j
 @Component
 @Order(1)
 public class BootStrap implements CommandLineRunner {
@@ -33,5 +35,7 @@ public class BootStrap implements CommandLineRunner {
 
         // 切分目标范围
         splitService.init();
+
+        log.info("Initialization finished !");
     }
 }

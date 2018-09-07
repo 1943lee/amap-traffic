@@ -24,7 +24,9 @@ CREATE TABLE t_parts
     useful INTEGER(1),
     shape_geo TEXT,
     result_status INTEGER(1),
-    result_info_code VARCHAR(10)
+    result_info_code VARCHAR(10),
+    result_info VARCHAR(10),
+    result_traffic TEXT
 );
 
 COMMIT TRANSACTION;

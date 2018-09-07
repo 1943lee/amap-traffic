@@ -1,10 +1,12 @@
 package com.keda.amap.traffic.service.amap;
 
+import com.keda.amap.traffic.bootstrap.Consts;
 import com.keda.amap.traffic.model.amap.BatchRequest;
 import com.keda.amap.traffic.model.amap.BatchRequest.GdUrl;
 import com.keda.amap.traffic.model.entity.Parts;
 import org.springframework.stereotype.Service;
 
+import java.util.ArrayList;
 import java.util.List;
 
 /**
@@ -13,9 +15,19 @@ import java.util.List;
  */
 @Service
 public class RequestService {
-    public BatchRequest getBatchRequestBody(List<Parts> parts) {
+    public BatchRequest getBatchRequestBody(String key, List<Parts> partsList) {
         BatchRequest batchRequest = new BatchRequest();
-        GdUrl gdUrl = new GdUrl();
 
+        List<GdUrl> gdUrls = new ArrayList<>();
+        batchRequest.setOps(gdUrls);
+        for(Parts parts : partsList) {
+            String url = Consts.gdTrafficEndpoint + key + "&rectangle=" + parts.getRequestRectangle();
+
+            GdUrl gdUrl = new GdUrl();
+            gdUrl.setUrl(url);
+            gdUrls.add(gdUrl);
+        }
+
+        return batchRequest;
     }
 }

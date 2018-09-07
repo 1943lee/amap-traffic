@@ -22,7 +22,7 @@ public interface Consts {
      */
     String gdHost = "http://restapi.amap.com/";
 
-    String gdBatchUrl = gdHost + "v3/batch";
+    String gdBatchUrl = gdHost + "v3/batch?key=";
 
-    String gdTrafficEndpoint = "/v3/traffic/status/rectangle";
+    String gdTrafficEndpoint = "/v3/traffic/status/rectangle?extensions=all&key=";
 }

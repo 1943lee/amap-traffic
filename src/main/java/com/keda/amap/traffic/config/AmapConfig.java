@@ -17,7 +17,7 @@ public class AmapConfig {
 
     private int index = 0;
 
-    public String getBaiBuAk() {
+    public String getApiKey() {
         if(null != apiKey && apiKey.length > 0) {
             String ak = apiKey[index];
             index++;

@@ -5,7 +5,7 @@
         </encoder>
     </appender>
 
-    <logger name="org.sql2o" level="debug"/>
+    <logger name="org.sql2o" level="info"/>
 
     <root level="INFO">
         <appender-ref ref="STDOUT" />

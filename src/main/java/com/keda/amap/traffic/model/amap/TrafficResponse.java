@@ -16,14 +16,21 @@ public class TrafficResponse {
     TrafficInfo trafficInfo;
 
     @Data
-    private class TrafficInfo {
+    public static class TrafficInfo {
         String description;
         Evaluation evaluation;
         List<Road> roads;
+
+        /**
+         * 如果没有道路的线信息，就当做空数据处理
+         */
+        public boolean isNull() {
+            return null == roads || (roads.size() == 1 && roads.get(0).isNull());
+        }
     }
 
     @Data
-    private class Evaluation {
+    public static class Evaluation {
         String blocked;
         String congested;
         String description;
@@ -34,12 +41,12 @@ public class TrafficResponse {
          * 2：缓行
          * 3：拥堵
          */
-        Integer status;
+        String status;
         String unknown;
     }
 
     @Data
-    private class Road {
+    public static class Road {
         Double angle;
         String direction;
         String lcodes;
@@ -52,6 +59,13 @@ public class TrafficResponse {
          * 2：缓行
          * 3：拥堵
          */
-        Integer status;
+        String status;
+
+        /**
+         * 如果没有线信息，就当做空数据处理
+         */
+        boolean isNull() {
+            return null == polyline;
+        }
     }
 }

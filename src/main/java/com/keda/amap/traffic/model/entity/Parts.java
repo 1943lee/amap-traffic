@@ -30,6 +30,15 @@ public class Parts extends Model {
     private Boolean inRegion;
     private Boolean useful;
     private String shapeGeo;
-    private Boolean resultStatus;
+    private Integer resultStatus;
     private String resultInfoCode;
+    private String resultInfo;
+    private String resultTraffic;
+
+    /**
+     * 获取高德请求面信息参数
+     */
+    public String getRequestRectangle() {
+        return xminGcj + "," + yminGcj + ";" + xmaxGcj + "," + ymaxGcj;
+    }
 }

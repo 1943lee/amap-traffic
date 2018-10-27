@@ -24,7 +24,7 @@ public class PartsService {
 
         if(rowStart == -1 & colStart == -1) {
             return select().from(Parts.class)
-                    .where(Parts::getInRegion).eq(true)
+                    .where(Parts::getUseful).eq(true)
                     .all();
         }
 
@@ -33,7 +33,7 @@ public class PartsService {
                 .and(Parts::getRow).lte(rowEnd)
                 .and(Parts::getCol).gte(colStart)
                 .and(Parts::getCol).lte(colEnd)
-                .and(Parts::getInRegion).eq(true)
+                .and(Parts::getUseful).eq(true)
                 .all();
     }
 

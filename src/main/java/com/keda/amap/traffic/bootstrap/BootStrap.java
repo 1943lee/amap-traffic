@@ -1,5 +1,6 @@
 package com.keda.amap.traffic.bootstrap;
 
+import com.keda.amap.traffic.config.SourceConfig;
 import com.keda.amap.traffic.service.split.RegionService;
 import com.keda.amap.traffic.service.split.SplitService;
 import io.github.biezhi.anima.Anima;
@@ -23,10 +24,13 @@ public class BootStrap implements CommandLineRunner {
     @Autowired
     RegionService regionService;
 
+    @Autowired
+    SourceConfig sourceConfig;
+
     @Override
     public void run(String... args) throws Exception {
         // 处理数据库相关
-        SqliteJdbc.importSql();
+        SqliteJdbc.importSql(sourceConfig.getFolder());
         Anima.open(SqliteJdbc.DB_SRC);
         Anima.me().getSql2o().setIsolationLevel(java.sql.Connection.TRANSACTION_SERIALIZABLE);
 

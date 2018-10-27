@@ -36,7 +36,7 @@ public class DoWork implements CommandLineRunner {
     TrafficSpider trafficSpider;
 
     @Override
-    public void run(String... args) {
+    public void run(String... args) throws Exception {
 
         // 暂时使用同一个key，测试请求间隔
         String key = amapConfig.getApiKey();
@@ -45,14 +45,22 @@ public class DoWork implements CommandLineRunner {
 
         int size = 20;
         int page = 1;
+        // 由于请求有QPS限制，此处需要进行限制
+        long interval = 500;
         while (true) {
-            Page<Parts> partsPage = partsService.getUsefulParts(page++, size);
+            long start = System.currentTimeMillis();
+            Page<Parts> partsPage = partsService.getInRegionParts(page++, size);
 
             List<Parts> rows = partsPage.getRows();
             BatchRequest batchRequest = requestService.getBatchRequestBody(key, rows);
 
             log.info("perform batch request, [{}]", batchUrl);
             trafficSpider.batch(batchUrl, batchRequest, rows);
+
+            long end = System.currentTimeMillis();
+            if (end - start < interval) {
+                Thread.sleep(interval - (end - start));
+            }
 
             log.info("perform request, 本次查询{}, 已完成{}, 共{}",
                     rows.size(),

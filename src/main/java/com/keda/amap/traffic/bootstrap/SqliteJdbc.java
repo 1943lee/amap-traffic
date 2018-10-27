@@ -17,7 +17,7 @@ import java.util.stream.Collectors;
  */
 @Slf4j
 public final class SqliteJdbc {
-    public static String DB_NAME = "amap.db";
+    public static String DB_NAME = "amap";
     public static String DB_PATH;
     public static String DB_SRC;
 
@@ -32,7 +32,8 @@ public final class SqliteJdbc {
     /**
      * 测试连接并导入数据库
      */
-    public static void importSql() {
+    public static void importSql(String profile) {
+        DB_NAME += "_" + profile + ".db";
         try {
             DB_PATH = System.getProperty("user.dir") + File.separator + DB_NAME;
             DB_SRC = "jdbc:sqlite://" + DB_PATH;

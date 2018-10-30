@@ -25,12 +25,12 @@ public class SplitService {
 
     private final SourceConfig sourceConfig;
 
-    @Autowired
-    RegionService regionService;
+    private final RegionService regionService;
 
     @Autowired
-    public SplitService(SourceConfig sourceConfig) {
+    public SplitService(SourceConfig sourceConfig, RegionService regionService) {
         this.sourceConfig = sourceConfig;
+        this.regionService = regionService;
     }
 
     /**

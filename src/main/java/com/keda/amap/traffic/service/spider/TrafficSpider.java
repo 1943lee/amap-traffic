@@ -22,8 +22,12 @@ import java.util.List;
 @Service
 public class TrafficSpider {
 
+    private final RestTemplate restTemplate;
+
     @Autowired
-    RestTemplate restTemplate;
+    public TrafficSpider(RestTemplate restTemplate) {
+        this.restTemplate = restTemplate;
+    }
 
     public void batch(String batchUrl, BatchRequest requestBody, List<Parts> partsList) {
         ResponseEntity<String> responseEntity = restTemplate.postForEntity(batchUrl, requestBody, String.class);

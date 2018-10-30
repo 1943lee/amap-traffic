@@ -11,8 +11,12 @@ import org.springframework.web.bind.annotation.RequestMapping;
  */
 @Controller
 public class IndexController {
+    private final AmapConfig amapConfig;
+
     @Autowired
-    AmapConfig amapConfig;
+    public IndexController(AmapConfig amapConfig) {
+        this.amapConfig = amapConfig;
+    }
 
     @RequestMapping("/")
     public String index(ModelMap map) {

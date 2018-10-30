@@ -2,54 +2,35 @@ server:
   port: 8083
 spring:
   profiles:
+    # 不同profile配置不同地区shape文件路径
     active: wulumuqi
+
+# 目标范围，切分矩形大小
+# 高德api描述：矩形的左下和右上点坐标，统一以中国为标准，保证计算出的行列号始终一致
+extent:
+  xmin: 70.0
+  xmax: 140.0
+  ymin: 3.0
+  ymax: 60.0
+  width: 5000.0
+  height: 5000.0
+
+amap:
+  webKey:
+  apiKey:
 
 ---
 spring:
   profiles: guangdong
 
-es:
-  hosts: 127.0.0.1:9200
-  username:
-  password:
-
-# 目标范围，切分矩形大小
-# 高德api描述：矩形的左下和右上点坐标
 extent:
   folder: guangdong
   description: 广东省
-  xmin: 109.62455750000002
-  xmax: 117.35477169999999
-  ymin: 20.061643551200053
-  ymax: 25.519607438727537
-  width: 5000.0
-  height: 5000.0
-
-amap:
-  webKey:
-  apiKey:
 
 ---
 spring:
   profiles: wulumuqi
 
-es:
-  hosts: 127.0.0.1:9200
-  username:
-  password:
-
-# 目标范围，切分矩形大小
-# 高德api描述：矩形的左下和右上点坐标
 extent:
   folder: wulumuqi
   description: 乌鲁木齐市
-  xmin: 86.802999
-  xmax: 88.978301
-  ymin: 42.824599
-  ymax: 45.000001
-  width: 5000.0
-  height: 5000.0
-
-amap:
-  webKey:
-  apiKey:

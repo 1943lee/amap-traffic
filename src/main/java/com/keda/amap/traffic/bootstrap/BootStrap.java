@@ -18,14 +18,16 @@ import org.springframework.stereotype.Component;
 @Component
 @Order(1)
 public class BootStrap implements CommandLineRunner {
-    @Autowired
-    SplitService splitService;
+    private final SplitService splitService;
+    private final RegionService regionService;
+    private final SourceConfig sourceConfig;
 
     @Autowired
-    RegionService regionService;
-
-    @Autowired
-    SourceConfig sourceConfig;
+    public BootStrap(SplitService splitService, RegionService regionService, SourceConfig sourceConfig) {
+        this.splitService = splitService;
+        this.regionService = regionService;
+        this.sourceConfig = sourceConfig;
+    }
 
     @Override
     public void run(String... args) throws Exception {

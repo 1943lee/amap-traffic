@@ -21,12 +21,16 @@ import java.util.List;
 @Service
 public class RegionService {
 
-    @Autowired
-    SourceConfig sourceConfig;
+    private final SourceConfig sourceConfig;
 
     private GeometryFactory geometryFactory = new GeometryFactory();
 
     private List<Geometry> regionGeometryList = new ArrayList<>();
+
+    @Autowired
+    public RegionService(SourceConfig sourceConfig) {
+        this.sourceConfig = sourceConfig;
+    }
 
     /**
      * 初始化目标区域Geometry
@@ -35,11 +39,25 @@ public class RegionService {
     public void initGeometry() throws Exception {
         String jsonFilePath = Consts.CLASSPATH + "regionWkt" + File.separator + sourceConfig.getFolder();
         File folder = new File(jsonFilePath);
-        if(folder.exists() && folder.isDirectory() && null != folder.listFiles()) {
-            for(File file : folder.listFiles()) {
-                String regionWkt = new String(Files.readAllBytes(file.toPath()));
-                WKTReader reader = new WKTReader(geometryFactory);
-                regionGeometryList.add(reader.read(regionWkt));
+        initGeometry(folder);
+    }
+
+    /**
+     * 递归遍历配置目录下所有文件，获取wkt文本
+     * @param directory 目录
+     * @throws Exception 解析异常
+     */
+    private void initGeometry(File directory) throws Exception {
+        if(directory.exists() && directory.isDirectory() && null != directory.listFiles()) {
+            for(File file : directory.listFiles()) {
+                if (file.isFile()) {
+                    String regionWkt = new String(Files.readAllBytes(file.toPath()));
+                    WKTReader reader = new WKTReader(geometryFactory);
+                    regionGeometryList.add(reader.read(regionWkt));
+                }
+                else if (file.isDirectory()) {
+                    initGeometry(file);
+                }
             }
         }
     }

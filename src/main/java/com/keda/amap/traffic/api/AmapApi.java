@@ -16,14 +16,19 @@ import java.util.ArrayList;
 import java.util.List;
 
 /**
+ * web api
  * Created by liChenYu on 2018/9/5
  */
 @Slf4j
 @RestController
 @RequestMapping("api")
 public class AmapApi {
+    private final PartsService partsService;
+
     @Autowired
-    PartsService partsService;
+    public AmapApi(PartsService partsService) {
+        this.partsService = partsService;
+    }
 
     @PostMapping("/search")
     public ResponseEntity<?> getSearchResultViaAjax(

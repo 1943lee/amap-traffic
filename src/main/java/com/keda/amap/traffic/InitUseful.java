@@ -14,29 +14,39 @@ import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 
+import java.io.File;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.List;
 
 /**
+ * 初始化useful矩形区域
  * Created by liChenYu on 2018/9/6
  */
 @Slf4j
 @Order(2)
 @Component
-public class DoWork implements CommandLineRunner {
-    @Autowired
-    PartsService partsService;
+public class InitUseful implements CommandLineRunner {
+    private final PartsService partsService;
+    private final AmapConfig amapConfig;
+    private final RequestService requestService;
+    private final TrafficSpider trafficSpider;
 
     @Autowired
-    AmapConfig amapConfig;
-
-    @Autowired
-    RequestService requestService;
-
-    @Autowired
-    TrafficSpider trafficSpider;
+    public InitUseful(PartsService partsService, AmapConfig amapConfig,
+                      RequestService requestService, TrafficSpider trafficSpider) {
+        this.partsService = partsService;
+        this.amapConfig = amapConfig;
+        this.requestService = requestService;
+        this.trafficSpider = trafficSpider;
+    }
 
     @Override
     public void run(String... args) throws Exception {
+        if (Files.exists(Paths.get(Consts.CLASSPATH + "initialize.lock"))) {
+            log.info("useful parts has been initialized！");
+            return;
+        }
 
         // 暂时使用同一个key，测试请求间隔
         String key = amapConfig.getApiKey();
@@ -45,13 +55,14 @@ public class DoWork implements CommandLineRunner {
 
         int size = 20;
         int page = 1;
-        // 由于请求有QPS限制，此处需要进行限制
+        // 由于请求有QPS限制，此处需要进行限制，请求间隔控制在500ms，即每秒40次
         long interval = 500;
         while (true) {
             long start = System.currentTimeMillis();
             Page<Parts> partsPage = partsService.getInRegionParts(page++, size);
 
             List<Parts> rows = partsPage.getRows();
+            if (null == rows) continue;
             BatchRequest batchRequest = requestService.getBatchRequestBody(key, rows);
 
             log.info("perform batch request, [{}]", batchUrl);
@@ -68,6 +79,8 @@ public class DoWork implements CommandLineRunner {
                     partsPage.getTotalRows());
 
             if(partsPage.isLastPage()) {
+                File lock = new File(Consts.CLASSPATH + "initialize.lock");
+                lock.createNewFile();
                 log.info("complete all {} requests!", partsPage.getTotalRows());
                 break;
             }

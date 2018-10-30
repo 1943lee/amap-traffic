@@ -18,8 +18,9 @@ public class PerformRequestTask {
 
     /**
      * 定时任务
+     * 每天7点到23点，每15min执行
      */
-    @Scheduled(cron = "* */15 7-0 * * *")
+    @Scheduled(cron = "0 */15 7-23 * * *")
     public void doRequest() {
         log.info("Start Performing request");
         //ToDo: 定时请求

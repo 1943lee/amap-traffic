@@ -7,11 +7,15 @@ import com.keda.amap.traffic.model.amap.BatchResponse;
 import com.keda.amap.traffic.model.amap.TrafficResponse;
 import com.keda.amap.traffic.model.entity.Parts;
 import io.github.biezhi.anima.Anima;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
+import org.apache.http.client.methods.CloseableHttpResponse;
+import org.apache.http.client.methods.HttpPost;
+import org.apache.http.entity.StringEntity;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
+import org.apache.http.util.EntityUtils;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.RestTemplate;
 
+import java.io.IOException;
 import java.util.List;
 
 /**
@@ -22,19 +26,9 @@ import java.util.List;
 @Service
 public class TrafficSpider {
 
-    private final RestTemplate restTemplate;
-
-    @Autowired
-    public TrafficSpider(RestTemplate restTemplate) {
-        this.restTemplate = restTemplate;
-    }
-
     public void batch(String batchUrl, BatchRequest requestBody, List<Parts> partsList) {
-        ResponseEntity<String> responseEntity = restTemplate.postForEntity(batchUrl, requestBody, String.class);
 
-        List<BatchResponse<TrafficResponse>> batchResponses =
-                JSON.parseObject(responseEntity.getBody(),
-                        new TypeReference<List<BatchResponse<TrafficResponse>>>() {});
+        List<BatchResponse<TrafficResponse>> batchResponses = getBatchResponses(batchUrl, requestBody);
 
         Anima.atomic(() -> {
             for (int i = 0; i < partsList.size(); i++) {
@@ -62,4 +56,22 @@ public class TrafficSpider {
         });
     }
 
+    private List<BatchResponse<TrafficResponse>> getBatchResponses(String batchUrl, BatchRequest requestBody) {
+        CloseableHttpClient httpClient = HttpClients.createDefault();
+        HttpPost httpPost = new HttpPost(batchUrl);
+        StringEntity entity = new StringEntity(JSON.toJSONString(requestBody), "utf-8");
+        entity.setContentEncoding("UTF-8");
+        entity.setContentType("application/json");
+        httpPost.setEntity(entity);
+
+        try {
+            CloseableHttpResponse response = httpClient.execute(httpPost);
+            String responseEntity = EntityUtils.toString(response.getEntity());
+            return JSON.parseObject(responseEntity,
+                    new TypeReference<List<BatchResponse<TrafficResponse>>>() {});
+        } catch (IOException e) {
+            e.printStackTrace();
+            return null;
+        }
+    }
 }

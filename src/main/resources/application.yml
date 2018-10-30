@@ -1,5 +1,3 @@
-server:
-  port: 8083
 spring:
   profiles:
     # 不同profile配置不同地区shape文件路径

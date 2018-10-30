@@ -26,6 +26,21 @@ spring:
 extent:
   folder: guangdong
   description: 广东省
+  subFiles:
+    - name: 东莞市
+      innerCode: 1.440000.441900
+    - name: 中山市
+      innerCode: 1.440000.442000
+    - name: 佛山市
+      innerCode: 1.440000.440600
+    - name: 广州市
+      innerCode: 1.440000.440100
+    - name: 惠州市
+      innerCode: 1.440000.441300
+    - name: 深圳市
+      innerCode: 1.440000.440300
+    - name: 珠海市
+      innerCode: 1.440000.440400
 
 ---
 spring:
@@ -34,3 +49,6 @@ spring:
 extent:
   folder: wulumuqi
   description: 乌鲁木齐市
+  subFiles:
+    - name: 乌鲁木齐市
+      innerCode: 1.650000.650100

@@ -1,8 +1,12 @@
 package com.keda.amap.traffic.config;
 
+import com.keda.amap.traffic.model.dto.DistrictRegion;
 import lombok.Data;
 import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.ArrayList;
+import java.util.List;
 
 /**
  * 目标范围extent
@@ -21,4 +25,7 @@ public class SourceConfig {
     private double ymax;
     private double width;
     private double height;
+
+    private List<DistrictRegion> subFiles = new ArrayList<>();
+
 }

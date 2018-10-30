@@ -16,17 +16,14 @@ CREATE TABLE t_parts
     xmax_gcj DECIMAL(9,6),
     ymin_gcj DECIMAL(9,6),
     ymax_gcj DECIMAL(9,6),
-    xmin_mer DECIMAL(15,6),
-    xmax_mer DECIMAL(15,6),
-    ymin_mer DECIMAL(15,6),
-    ymax_mer DECIMAL(15,6),
     in_region INTEGER (1),
     useful INTEGER(1),
     shape_geo TEXT,
     result_status INTEGER(1),
     result_info_code VARCHAR(10),
     result_info VARCHAR(10),
-    result_traffic TEXT
+    result_traffic TEXT,
+    district_region TEXT
 );
 
 COMMIT TRANSACTION;

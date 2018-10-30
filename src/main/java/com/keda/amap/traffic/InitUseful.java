@@ -81,7 +81,7 @@ public class InitUseful implements CommandLineRunner {
             if(partsPage.isLastPage()) {
                 File lock = new File(Consts.CLASSPATH + "initialize.lock");
                 lock.createNewFile();
-                log.info("complete all {} requests!", partsPage.getTotalRows());
+                log.info("initializing is initialized, {} requests in total!", partsPage.getTotalRows());
                 break;
             }
         }

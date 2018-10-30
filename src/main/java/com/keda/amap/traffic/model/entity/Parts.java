@@ -23,10 +23,6 @@ public class Parts extends Model {
     private Double xmaxGcj;
     private Double yminGcj;
     private Double ymaxGcj;
-    private Double xminMer;
-    private Double xmaxMer;
-    private Double yminMer;
-    private Double ymaxMer;
     private Boolean inRegion;
     private Boolean useful;
     private String shapeGeo;
@@ -34,6 +30,10 @@ public class Parts extends Model {
     private String resultInfoCode;
     private String resultInfo;
     private String resultTraffic;
+    /**
+     * 行政区域信息，存储格式为json串
+     */
+    private String districtRegion;
 
     /**
      * 获取高德请求面信息参数

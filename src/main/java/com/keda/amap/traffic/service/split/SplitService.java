@@ -82,21 +82,19 @@ public class SplitService {
                 parts.setYmin(xminYmin[1]);
                 parts.setXmax(xmaxYmax[0]);
                 parts.setYmax(xmaxYmax[1]);
-                parts.setXminMer(xmin_mercator);
-                parts.setYminMer(ymin_mercator);
-                parts.setXmaxMer(xmax_mercator);
-                parts.setYmaxMer(ymax_mercator);
                 parts.setXminGcj(xminYminGcj02[0]);
                 parts.setYminGcj(xminYminGcj02[1]);
                 parts.setXmaxGcj(xmaxYmaxGcj02[0]);
                 parts.setYmaxGcj(xmaxYmaxGcj02[1]);
 
-                parts.setInRegion(regionService.inRegion(xminYmin[0], xminYmin[1], xmaxYmax[0], xmaxYmax[1]));
                 // 不在指定范围内的矩形，不入库
-                if(!parts.getInRegion()) {
+                if(!regionService.setRegionInfo(parts, xminYmin[0], xminYmin[1], xmaxYmax[0], xmaxYmax[1])) {
                     outOfRegionCount++;
                     continue;
                 }
+
+                // 生成geo_shape字段
+                parts.setShapeGeo(regionService.getPartGeoShape(xminYmin[0], xminYmin[1], xmaxYmax[0], xmaxYmax[1]));
 
                 partsList.add(parts);
 
@@ -104,7 +102,8 @@ public class SplitService {
                 if(limit == 0) {
                     operateCount += 5000;
                     Anima.atomic(() -> partsList.forEach(Model::save));
-                    log.info("本次插入{},已插入{},区域外数据{},总量{}", 5000, operateCount, outOfRegionCount, xTimes * yTimes);
+                    log.info("本次插入{},已插入{},区域外数据{},总量{}", 5000,
+                            operateCount, outOfRegionCount, xTimes * yTimes);
                     partsList.clear();
                     limit = 5000;
                 }
@@ -114,7 +113,8 @@ public class SplitService {
         if(partsList.size() > 0) {
             operateCount += partsList.size();
             Anima.atomic(() -> partsList.forEach(Model::save));
-            log.info("本次插入{},已插入{},区域外数据{},总量{}", partsList.size(), operateCount, outOfRegionCount, xTimes * yTimes);
+            log.info("本次插入{},已插入{},区域外数据{},总量{}", partsList.size(),
+                    operateCount, outOfRegionCount, xTimes * yTimes);
         }
 
     }

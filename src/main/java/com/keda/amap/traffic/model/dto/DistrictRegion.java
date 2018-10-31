@@ -9,6 +9,7 @@ import lombok.Data;
  */
 @Data
 public class DistrictRegion {
+    private String filename;
     private String name;
     private String innerCode;
 }

@@ -44,6 +44,7 @@ public class RegionService {
     public void initGeometry() throws Exception {
         String jsonFilePath = Consts.CLASSPATH + "regionWkt" + File.separator + sourceConfig.getFolder();
         File folder = new File(jsonFilePath);
+        log.info("initialize geometry, folder path is {}", jsonFilePath);
         initGeometry(folder);
     }
 
@@ -66,12 +67,15 @@ public class RegionService {
                     initGeometry(file);
                 }
             }
+        } else {
+            log.error("no file has been found!");
         }
     }
 
     private ConfiguredGeometry getRegionInfo(File file, Geometry geometry) throws Exception {
+        log.info("load file, {}", file.getName());
         for (DistrictRegion districtRegion : sourceConfig.getSubFiles()) {
-            if (file.getName().equals(districtRegion.getName() + ".wkt")) {
+            if (file.getName().equals(districtRegion.getFilename() + ".wkt")) {
                 return new ConfiguredGeometry(geometry, districtRegion.getName(), districtRegion.getInnerCode());
             }
         }

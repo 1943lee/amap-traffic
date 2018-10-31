@@ -26,6 +26,10 @@ import java.util.List;
 @Service
 public class TrafficSpider {
 
+    public List<BatchResponse<TrafficResponse>> batch(String batchUrl, BatchRequest requestBody) {
+        return getBatchResponses(batchUrl, requestBody);
+    }
+
     public void batch(String batchUrl, BatchRequest requestBody, List<Parts> partsList) {
 
         List<BatchResponse<TrafficResponse>> batchResponses = getBatchResponses(batchUrl, requestBody);

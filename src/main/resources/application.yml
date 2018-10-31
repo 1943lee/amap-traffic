@@ -14,8 +14,13 @@ extent:
   height: 5000.0
 
 amap:
-  webKey:
   apiKey:
+
+app:
+  kafka:
+    brokers: 172.16.233.204:9092,172.16.233.205:9092
+    producer:
+      topic: t_gdroad_data
 
 ---
 spring:

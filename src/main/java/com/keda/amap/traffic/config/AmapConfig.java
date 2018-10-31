@@ -11,8 +11,6 @@ import org.springframework.context.annotation.Configuration;
 @Configuration
 @ConfigurationProperties(prefix = "amap")
 public class AmapConfig {
-    private String webKey;
-
     private String[] apiKey;
 
     private int index = 0;

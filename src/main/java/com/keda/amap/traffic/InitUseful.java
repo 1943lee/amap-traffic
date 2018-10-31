@@ -45,6 +45,7 @@ public class InitUseful implements CommandLineRunner {
     public void run(String... args) throws Exception {
         if (Files.exists(Paths.get(Consts.CLASSPATH + "initialize.lock"))) {
             log.info("useful parts has been initialized！");
+            Consts.INITIALIZED = true;
             return;
         }
 
@@ -82,6 +83,7 @@ public class InitUseful implements CommandLineRunner {
                 File lock = new File(Consts.CLASSPATH + "initialize.lock");
                 lock.createNewFile();
                 log.info("initializing is initialized, {} requests in total!", partsPage.getTotalRows());
+                Consts.INITIALIZED = true;
                 break;
             }
         }

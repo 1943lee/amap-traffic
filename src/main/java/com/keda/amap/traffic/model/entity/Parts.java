@@ -41,4 +41,8 @@ public class Parts extends Model {
     public String getRequestRectangle() {
         return xminGcj + "," + yminGcj + ";" + xmaxGcj + "," + ymaxGcj;
     }
+
+    public String getESId() {
+        return row + "#" + col;
+    }
 }

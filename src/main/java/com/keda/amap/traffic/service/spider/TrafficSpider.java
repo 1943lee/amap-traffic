@@ -6,6 +6,7 @@ import com.keda.amap.traffic.model.amap.BatchRequest;
 import com.keda.amap.traffic.model.amap.BatchResponse;
 import com.keda.amap.traffic.model.amap.TrafficResponse;
 import com.keda.amap.traffic.model.entity.Parts;
+import com.keda.amap.traffic.util.AsciiUtil;
 import io.github.biezhi.anima.Anima;
 import org.apache.http.client.methods.CloseableHttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -44,7 +45,7 @@ public class TrafficSpider {
                 newParts.setResultStatus(Integer.valueOf(trafficResponse.getStatus()));
                 newParts.setResultInfoCode(trafficResponse.getInfocode());
                 newParts.setResultInfo(trafficResponse.getInfo());
-                newParts.setResultTraffic(JSON.toJSONString(trafficResponse.getTrafficInfo()));
+                newParts.setResultTraffic(AsciiUtil.sbc2dbcCase(JSON.toJSONString(trafficResponse.getTrafficInfo())));
 
                 // 1. 返回-请求成功
                 // 2. 返回-返回结果包含有效道路

@@ -16,6 +16,7 @@ import com.keda.amap.traffic.service.amap.PartsService;
 import com.keda.amap.traffic.service.amap.RequestService;
 import com.keda.amap.traffic.service.kafka.ProduceService;
 import com.keda.amap.traffic.service.spider.TrafficSpider;
+import com.keda.amap.traffic.util.AsciiUtil;
 import io.github.biezhi.anima.page.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -137,7 +138,7 @@ public class PerformRequestTask {
         rootMsg.put("WGLH", parts.getCol());
         rootMsg.put("WGMC", "");
         rootMsg.put("LKSJ", time);
-        rootMsg.put("LKNR", JSON.toJSONString(trafficResponse.getTrafficInfo()));
+        rootMsg.put("LKNR", AsciiUtil.sbc2dbcCase(JSON.toJSONString(trafficResponse.getTrafficInfo())));
         rootMsg.put("SZDXZQH", JSONObject.parseObject(parts.getDistrictRegion()));
         rootMsg.put("SHAPE", JSONObject.parseObject(parts.getShapeGeo()));
         rootMsg.put("GXSJ", time);

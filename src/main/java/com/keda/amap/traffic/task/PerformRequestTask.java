@@ -154,6 +154,7 @@ public class PerformRequestTask {
 
         for (Road road : roads) {
             String polyline = road.getPolyline();
+            if (null == polyline || polyline.isEmpty()) continue;
             road.setPolyline(JtsUtil.simplify(polyline, 0.0001));
         }
 

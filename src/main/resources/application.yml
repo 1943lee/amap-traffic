@@ -1,7 +1,7 @@
 spring:
   profiles:
     # 不同profile配置不同地区shape文件路径
-    active: wulumuqi
+    active: shanghai
 
 # 目标范围，切分矩形大小
 # 高德api描述：矩形的左下和右上点坐标，统一以中国为标准，保证计算出的行列号始终一致
@@ -63,3 +63,15 @@ extent:
     - filename: wulumuqishi
       name: 乌鲁木齐市
       innerCode: 1.650000.650100
+
+---
+spring:
+  profiles: shanghai
+
+extent:
+  folder: shanghai
+  description: 上海市
+  subFiles:
+    - filename: shanghaishi
+      name: 上海市
+      innerCode: 1.310000

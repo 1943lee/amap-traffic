@@ -1,6 +1,5 @@
 package com.keda.amap.traffic.task;
 
-import com.alibaba.fastjson.JSON;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
@@ -10,6 +9,8 @@ import com.keda.amap.traffic.config.AmapConfig;
 import com.keda.amap.traffic.model.amap.BatchRequest;
 import com.keda.amap.traffic.model.amap.BatchResponse;
 import com.keda.amap.traffic.model.amap.TrafficResponse;
+import com.keda.amap.traffic.model.amap.TrafficResponse.Road;
+import com.keda.amap.traffic.model.amap.TrafficResponse.TrafficInfo;
 import com.keda.amap.traffic.model.entity.Parts;
 import com.keda.amap.traffic.model.kafka.Message;
 import com.keda.amap.traffic.service.amap.PartsService;
@@ -17,6 +18,7 @@ import com.keda.amap.traffic.service.amap.RequestService;
 import com.keda.amap.traffic.service.kafka.ProduceService;
 import com.keda.amap.traffic.service.spider.TrafficSpider;
 import com.keda.amap.traffic.util.AsciiUtil;
+import com.keda.amap.traffic.util.JtsUtil;
 import io.github.biezhi.anima.page.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -138,11 +140,23 @@ public class PerformRequestTask {
         rootMsg.put("WGLH", parts.getCol());
         rootMsg.put("WGMC", "");
         rootMsg.put("LKSJ", time);
-        rootMsg.put("LKNR", AsciiUtil.sbc2dbcCase(JSON.toJSONString(trafficResponse.getTrafficInfo())));
+        rootMsg.put("LKNR", AsciiUtil.sbc2dbcCase(getSimplifiedRoad(trafficResponse.getTrafficInfo())));
         rootMsg.put("SZDXZQH", JSONObject.parseObject(parts.getDistrictRegion()));
         rootMsg.put("SHAPE", JSONObject.parseObject(parts.getShapeGeo()));
         rootMsg.put("GXSJ", time);
 
         return rootMsg.toJSONString();
+    }
+
+    private String getSimplifiedRoad(TrafficInfo trafficInfo) {
+        List<Road> roads = trafficInfo.getRoads();
+        if (roads == null || roads.size() == 0) return "";
+
+        for (Road road : roads) {
+            String polyline = road.getPolyline();
+            road.setPolyline(JtsUtil.simplify(polyline, 0.0001));
+        }
+
+        return JSONObject.toJSONString(trafficInfo);
     }
 }

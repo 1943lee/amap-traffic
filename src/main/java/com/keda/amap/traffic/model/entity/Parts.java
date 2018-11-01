@@ -43,6 +43,6 @@ public class Parts extends Model {
     }
 
     public String getESId() {
-        return row + "#" + col;
+        return row + "A" + col;
     }
 }

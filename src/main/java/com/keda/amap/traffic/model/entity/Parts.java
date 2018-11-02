@@ -42,7 +42,11 @@ public class Parts extends Model {
         return xminGcj + "," + yminGcj + ";" + xmaxGcj + "," + ymaxGcj;
     }
 
-    public String getESId() {
+    public String getObjectId() {
         return row + "A" + col;
+    }
+
+    public String getESId(int level) {
+        return row + "A" + col + "A" + level;
     }
 }

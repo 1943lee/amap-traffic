@@ -13,14 +13,17 @@ import org.springframework.context.annotation.Configuration;
 public class AmapConfig {
     private String[] apiKey;
 
-    private int index = 0;
+    private Integer[] level;
+
+    private volatile Integer index = 0;
 
     public String getApiKey() {
         if(null != apiKey && apiKey.length > 0) {
-            String ak = apiKey[index];
-            index++;
-            index = index % apiKey.length;
-            return ak;
+            synchronized(index)  {
+                String ak = apiKey[index];
+                index = (++index) % apiKey.length;
+                return ak;
+            }
         }
         return "";
     }

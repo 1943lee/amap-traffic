@@ -14,6 +14,7 @@ extent:
   height: 5000.0
 
 amap:
+  level: 3,4,5
   apiKey: bc4831422fb325fed443f7eeaca0fbb5
 
 app:
@@ -32,25 +33,25 @@ extent:
   subFiles:
     - filename: dongguanshi
       name: 东莞市
-      innerCode: 1.440000.441900
+      innerCode: '1.440000.441900'
     - filename: zhongshanshi
       name: 中山市
-      innerCode: 1.440000.442000
+      innerCode: '1.440000.442000'
     - filename: foshanshi
       name: 佛山市
-      innerCode: 1.440000.440600
+      innerCode: '1.440000.440600'
     - filename: guangdongshi
       name: 广州市
-      innerCode: 1.440000.440100
+      innerCode: '1.440000.440100'
     - filename: huizhoushi
       name: 惠州市
-      innerCode: 1.440000.441300
+      innerCode: '1.440000.441300'
     - filename: shenzhenshi
       name: 深圳市
-      innerCode: 1.440000.440300
+      innerCode: '1.440000.440300'
     - filename: zhuhaishi
       name: 珠海市
-      innerCode: 1.440000.440400
+      innerCode: '1.440000.440400'
 
 ---
 spring:
@@ -62,7 +63,7 @@ extent:
   subFiles:
     - filename: wulumuqishi
       name: 乌鲁木齐市
-      innerCode: 1.650000.650100
+      innerCode: '1.650000.650100'
 
 ---
 spring:
@@ -74,4 +75,5 @@ extent:
   subFiles:
     - filename: shanghaishi
       name: 上海市
-      innerCode: 1.310000
+      innerCode: '1.310000'
+

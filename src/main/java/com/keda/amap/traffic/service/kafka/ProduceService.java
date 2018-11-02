@@ -21,23 +21,11 @@ public class ProduceService {
     @Autowired
     public ProduceService(KafkaConfig kafkaConfig) {
         this.kafkaConfig = kafkaConfig;
-    }
-
-    //生产者
-    private void getKafkaProducer() {
-        try {
-            kafkaProducer = new KafkaProducer<>(kafkaConfig.producerProperties());
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
+        this.kafkaProducer = new KafkaProducer<>(kafkaConfig.producerProperties());
     }
 
     //发送数据
     public void sendMessage(String id, String message) {
-        if (kafkaProducer == null) {
-            getKafkaProducer();
-        }
-
         try {
             String topicName = kafkaConfig.getTopic();
             ProducerRecord<String, String> record = new ProducerRecord<>(topicName, id, message);

@@ -23,6 +23,7 @@ import io.github.biezhi.anima.page.Page;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.autoconfigure.AutoConfigureAfter;
+import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -41,6 +42,7 @@ import java.util.concurrent.Executors;
 @Slf4j
 @Component
 @AutoConfigureAfter(InitUseful.class)
+@EnableScheduling
 public class PerformRequestTask {
 
     private final AmapConfig amapConfig;
@@ -65,9 +67,9 @@ public class PerformRequestTask {
 
     /**
      * 定时任务
-     * 每天5点到23点，每15min执行
+     * 每天6点到23点，每30min执行
      */
-    @Scheduled(cron = "0 */15 5-23 * * *")
+    @Scheduled(cron = "0 */30 6-23 * * *")
     public void doRequest() throws InterruptedException {
         if (!Consts.INITIALIZED) {
             log.info("scheduling is waiting for initialization!");
@@ -77,6 +79,24 @@ public class PerformRequestTask {
         log.info("Start Performing request");
         final String time = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss").format(LocalDateTime.now());
 
+        Integer[] level = amapConfig.getLevel();
+        if (null != level && level.length > 0) {
+            for (Integer i : level) {
+                doRequest(time, i);
+            }
+        }
+        else {
+            doRequest(time, 5);
+        }
+    }
+
+    /**
+     * 发起请求-由于存在QPS限制，单ak时需要同步处理
+     * @param time 请求开始时间 用于统一路况时间
+     * @param level 道路级别，默认 5
+     * @throws InterruptedException Thread
+     */
+    private void doRequest(String time, int level) throws InterruptedException {
         int size = 20;
         int page = 1;
         // 由于请求有QPS限制，此处需要进行限制，请求间隔控制在500ms，即每秒40次
@@ -92,38 +112,37 @@ public class PerformRequestTask {
 
             List<Parts> rows = partsPage.getRows();
             if (null == rows) continue;
-            BatchRequest batchRequest = requestService.getBatchRequestBody(key, rows);
+            BatchRequest batchRequest = requestService.getBatchRequestBody(key, rows, level);
 
-            pushMessage(trafficSpider.batch(batchUrl, batchRequest), rows, time);
+            pushMessage(trafficSpider.batch(batchUrl, batchRequest), rows, time, level);
 
             long end = System.currentTimeMillis();
             if (end - start < interval) {
                 Thread.sleep(interval - (end - start));
             }
 
-            log.info("perform request, 本次查询{}, 已完成{}, 共{}",
+            log.info("perform request, level = {}, 本次查询{}, 已完成{}, 共{}", level,
                     rows.size(),
                     partsPage.isLastPage() ? partsPage.getTotalRows() : partsPage.getPageNum() * size,
                     partsPage.getTotalRows());
 
             if(partsPage.isLastPage()) {
-                log.info("Finish Performing request, {} requests in total!", partsPage.getTotalRows());
                 break;
             }
         }
     }
 
     private void pushMessage(List<BatchResponse<TrafficResponse>> batchResponses,
-                             List<Parts> partsList, String time) {
+                             List<Parts> partsList, String time, int level) {
         Runnable runnable = () -> {
             for (int i = 0; i < partsList.size(); i++) {
                 Parts parts = partsList.get(i);
                 TrafficResponse trafficResponse = batchResponses.get(i).getBody();
-                String xxbh = parts.getESId();
+                String xxbh = parts.getESId(level);
                 Message message = new Message();
                 message.setXXBH(xxbh);
                 message.setXXLB("ez_lkt_write");
-                message.setXXNR(generateTrafficESMessage(parts, trafficResponse, time));
+                message.setXXNR(generateTrafficESMessage(parts, trafficResponse, time, level));
                 message.setCZSJ(new Date());
 
                 produceService.sendMessage(xxbh, gson.toJson(message));
@@ -132,10 +151,12 @@ public class PerformRequestTask {
         executorService.execute(runnable);
     }
 
-    private String generateTrafficESMessage(Parts parts, TrafficResponse trafficResponse, String time) {
+    private String generateTrafficESMessage(Parts parts, TrafficResponse trafficResponse, String time, int level) {
         JSONObject rootMsg = new JSONObject();
-        // 主键采用'行号#列号'格式，保证唯一
-        rootMsg.put("WGBH", parts.getESId());
+        // 主键采用'行号A列号'格式，保证唯一
+        rootMsg.put("WGBH", parts.getObjectId());
+        // 道路级别，根据传入数据显示
+        rootMsg.put("DLJB", level);
         rootMsg.put("WGHH", parts.getRow());
         rootMsg.put("WGLH", parts.getCol());
         rootMsg.put("WGMC", "");
@@ -149,6 +170,7 @@ public class PerformRequestTask {
     }
 
     private String getSimplifiedRoad(TrafficInfo trafficInfo) {
+        if (null == trafficInfo) return "";
         List<Road> roads = trafficInfo.getRoads();
         if (roads == null || roads.size() == 0) return "";
 
@@ -160,4 +182,5 @@ public class PerformRequestTask {
 
         return JSONObject.toJSONString(trafficInfo);
     }
+
 }

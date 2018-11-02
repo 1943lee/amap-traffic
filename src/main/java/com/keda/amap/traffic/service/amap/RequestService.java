@@ -15,13 +15,31 @@ import java.util.List;
  */
 @Service
 public class RequestService {
+    /**
+     * 指定道路等级，下面各值代表的含义：
+     * 1：高速（京藏高速）
+     * 2：城市快速路、国道(西三环、103国道)
+     * 3：高速辅路（G6辅路）
+     * 4：主要道路（长安街、三环辅路路）
+     * 5：一般道路（彩和坊路）
+     * 6：无名道路
+     *
+     * 默认为5
+     */
+    private static final int DEFAULT_LEVEL = 5;
+
     public BatchRequest getBatchRequestBody(String key, List<Parts> partsList) {
+        return getBatchRequestBody(key, partsList, DEFAULT_LEVEL);
+    }
+
+    public BatchRequest getBatchRequestBody(String key, List<Parts> partsList, int level) {
         BatchRequest batchRequest = new BatchRequest();
 
         List<GdUrl> gdUrls = new ArrayList<>();
         batchRequest.setOps(gdUrls);
         for(Parts parts : partsList) {
-            String url = Consts.gdTrafficEndpoint + key + "&rectangle=" + parts.getRequestRectangle();
+            String url = Consts.gdTrafficEndpoint + key + "&level=" + level +
+                    "&rectangle=" + parts.getRequestRectangle();
 
             GdUrl gdUrl = new GdUrl();
             gdUrl.setUrl(url);

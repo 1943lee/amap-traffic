@@ -2,13 +2,19 @@ package com.keda.amap.traffic;
 
 import com.keda.amap.traffic.bootstrap.Consts;
 import com.keda.amap.traffic.config.AmapConfig;
+import com.keda.amap.traffic.config.JobConfig;
 import com.keda.amap.traffic.model.amap.BatchRequest;
 import com.keda.amap.traffic.model.entity.Parts;
+import com.keda.amap.traffic.service.IJobService;
+import com.keda.amap.traffic.service.MyJobService;
 import com.keda.amap.traffic.service.amap.PartsService;
 import com.keda.amap.traffic.service.amap.RequestService;
 import com.keda.amap.traffic.service.spider.TrafficSpider;
+import com.keda.amap.traffic.task.PerformRequestTask;
 import io.github.biezhi.anima.page.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.CronExpression;
+import org.quartz.Scheduler;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.CommandLineRunner;
 import org.springframework.core.annotation.Order;
@@ -31,14 +37,21 @@ public class InitUseful implements CommandLineRunner {
     private final AmapConfig amapConfig;
     private final RequestService requestService;
     private final TrafficSpider trafficSpider;
+    private final JobConfig jobConfig;
+    private final Scheduler scheduler;
+    private final IJobService jobService;
 
     @Autowired
     public InitUseful(PartsService partsService, AmapConfig amapConfig,
-                      RequestService requestService, TrafficSpider trafficSpider) {
+                      RequestService requestService, TrafficSpider trafficSpider,
+                      JobConfig jobConfig, Scheduler scheduler, MyJobService jobService) {
         this.partsService = partsService;
         this.amapConfig = amapConfig;
         this.requestService = requestService;
         this.trafficSpider = trafficSpider;
+        this.jobConfig = jobConfig;
+        this.scheduler = scheduler;
+        this.jobService = jobService;
     }
 
     @Override
@@ -46,10 +59,18 @@ public class InitUseful implements CommandLineRunner {
         if (Files.exists(Paths.get(Consts.CLASSPATH + "initialize.lock"))) {
             log.info("useful parts has been initialized！");
             Consts.INITIALIZED = true;
-            return;
+        } else {
+            doInitUseful();
         }
 
-        // 暂时使用同一个key，测试请求间隔
+        scheduler.start();
+        if (jobConfig.isEnable() && CronExpression.isValidExpression(jobConfig.getCron())) {
+            log.info("add job {}", jobConfig.getDescription());
+            jobService.addJob(scheduler, PerformRequestTask.class.getName(), jobConfig.getGroup(), jobConfig.getCron());
+        }
+    }
+
+    private void doInitUseful() throws Exception {
         String key = amapConfig.getApiKey();
 
         String batchUrl = Consts.gdBatchUrl + key;

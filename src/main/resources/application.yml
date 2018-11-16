@@ -18,6 +18,13 @@ amap:
   apiKey: bc4831422fb325fed443f7eeaca0fbb5
 
 app:
+  job:
+    enable: true
+    #cron表达式： 秒 分 时 日 月 周
+    #此处配置为 每天6点到23点，每30min执行
+    cron: "0 */30 6-23 * * ?"
+    description: 高德路况数据爬虫
+    group: gaoDeTraffic
   kafka:
     brokers: 172.16.233.204:9092,172.16.233.205:9092
     producer:

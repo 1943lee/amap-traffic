@@ -30,6 +30,11 @@
             <artifactId>spring-boot-starter</artifactId>
         </dependency>
 
+        <dependency>
+            <groupId>org.springframework.boot</groupId>
+            <artifactId>spring-boot-starter-quartz</artifactId>
+        </dependency>
+
         <!-- geo处理相关 -->
         <dependency>
             <groupId>org.locationtech.spatial4j</groupId>
@@ -85,18 +90,6 @@
             <groupId>com.google.code.gson</groupId>
             <artifactId>gson</artifactId>
             <version>2.8.0</version>
-        </dependency>
-
-        <!-- Geometry -->
-        <dependency>
-            <groupId>org.locationtech.spatial4j</groupId>
-            <artifactId>spatial4j</artifactId>
-            <version>0.6</version>
-        </dependency>
-        <dependency>
-            <groupId>com.vividsolutions</groupId>
-            <artifactId>jts</artifactId>
-            <version>1.13</version>
         </dependency>
 
     </dependencies>

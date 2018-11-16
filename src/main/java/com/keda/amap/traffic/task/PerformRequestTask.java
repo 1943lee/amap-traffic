@@ -3,7 +3,6 @@ package com.keda.amap.traffic.task;
 import com.alibaba.fastjson.JSONObject;
 import com.google.gson.Gson;
 import com.google.gson.GsonBuilder;
-import com.keda.amap.traffic.InitUseful;
 import com.keda.amap.traffic.bootstrap.Consts;
 import com.keda.amap.traffic.config.AmapConfig;
 import com.keda.amap.traffic.model.amap.BatchRequest;
@@ -21,11 +20,10 @@ import com.keda.amap.traffic.util.AsciiUtil;
 import com.keda.amap.traffic.util.JtsUtil;
 import io.github.biezhi.anima.page.Page;
 import lombok.extern.slf4j.Slf4j;
+import org.quartz.DisallowConcurrentExecution;
+import org.quartz.Job;
+import org.quartz.JobExecutionContext;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.boot.autoconfigure.AutoConfigureAfter;
-import org.springframework.scheduling.annotation.EnableScheduling;
-import org.springframework.scheduling.annotation.Scheduled;
-import org.springframework.stereotype.Component;
 
 import java.time.LocalDateTime;
 import java.time.format.DateTimeFormatter;
@@ -40,37 +38,31 @@ import java.util.concurrent.Executors;
  * @date 2018/10/30
  */
 @Slf4j
-@Component
-@AutoConfigureAfter(InitUseful.class)
-@EnableScheduling
-public class PerformRequestTask {
-
-    private final AmapConfig amapConfig;
-    private final PartsService partsService;
-    private final RequestService requestService;
-    private final TrafficSpider trafficSpider;
-    private final ProduceService produceService;
+@DisallowConcurrentExecution
+public class PerformRequestTask implements Job {
+    /**
+     * 在Quartz Job中注入bean，需使用属性注入形式，不可使用构造函数注入
+     */
+    @Autowired
+    private AmapConfig amapConfig;
+    @Autowired
+    PartsService partsService;
+    @Autowired
+    RequestService requestService;
+    @Autowired
+    TrafficSpider trafficSpider;
+    @Autowired
+    ProduceService produceService;
 
     private static Gson gson = new GsonBuilder().setDateFormat("yyyy-MM-dd HH:mm:ss").create();
     private static ExecutorService executorService = Executors.newFixedThreadPool(4);
 
-    @Autowired
-    public PerformRequestTask(AmapConfig amapConfig, PartsService partsService,
-                              RequestService requestService, TrafficSpider trafficSpider,
-                              ProduceService produceService) {
-        this.amapConfig = amapConfig;
-        this.partsService = partsService;
-        this.requestService = requestService;
-        this.trafficSpider = trafficSpider;
-        this.produceService = produceService;
+    @Override
+    public void execute(JobExecutionContext jobExecutionContext) {
+        doRequest();
     }
 
-    /**
-     * 定时任务
-     * 每天6点到23点，每30min执行
-     */
-    @Scheduled(cron = "0 */30 6-23 * * *")
-    public void doRequest() throws InterruptedException {
+    private void doRequest() {
         if (!Consts.INITIALIZED) {
             log.info("scheduling is waiting for initialization!");
             return;
@@ -94,9 +86,8 @@ public class PerformRequestTask {
      * 发起请求-由于存在QPS限制，单ak时需要同步处理
      * @param time 请求开始时间 用于统一路况时间
      * @param level 道路级别，默认 5
-     * @throws InterruptedException Thread
      */
-    private void doRequest(String time, int level) throws InterruptedException {
+    private void doRequest(String time, int level) {
         int size = 20;
         int page = 1;
         // 由于请求有QPS限制，此处需要进行限制，请求间隔控制在500ms，即每秒40次
@@ -118,7 +109,11 @@ public class PerformRequestTask {
 
             long end = System.currentTimeMillis();
             if (end - start < interval) {
-                Thread.sleep(interval - (end - start));
+                try {
+                    Thread.sleep(interval - (end - start));
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
 
             log.info("perform request, level = {}, 本次查询{}, 已完成{}, 共{}", level,

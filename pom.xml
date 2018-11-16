@@ -95,7 +95,7 @@
     </dependencies>
 
     <build>
-        <finalName>amap-traffic-waiWang</finalName>
+        <finalName>amap_traffic_waiWang</finalName>
         <plugins>
             <plugin>
                 <groupId>org.springframework.boot</groupId>
